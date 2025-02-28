@@ -1,15 +1,6 @@
-import { App, Stack, StackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import { App } from 'aws-cdk-lib';
+import { DynamicDnsStack } from './DynamicDnsStack';
 
-export class MyStack extends Stack {
-  constructor(scope: Construct, id: string, props: StackProps = {}) {
-    super(scope, id, props);
-
-    // define resources here...
-  }
-}
-
-// for development, use account/region from cdk cli
 const devEnv = {
   account: process.env.CDK_DEFAULT_ACCOUNT,
   region: process.env.CDK_DEFAULT_REGION,
@@ -17,7 +8,6 @@ const devEnv = {
 
 const app = new App();
 
-new MyStack(app, 'route53-dynamicdns-dev', { env: devEnv });
-// new MyStack(app, 'route53-dynamicdns-prod', { env: prodEnv });
+new DynamicDnsStack(app, 'route53-dynamicdns', { env: devEnv, hostedZoneName: 'conklin.io', pollInterval: 120 });
 
 app.synth();

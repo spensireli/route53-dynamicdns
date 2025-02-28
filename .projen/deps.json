@@ -1,8 +1,20 @@
 {
   "dependencies": [
     {
+      "name": "@aws-sdk/client-route-53",
+      "type": "build"
+    },
+    {
+      "name": "@aws-sdk/client-ssm",
+      "type": "build"
+    },
+    {
       "name": "@stylistic/eslint-plugin",
       "version": "^2",
+      "type": "build"
+    },
+    {
+      "name": "@types/aws-lambda",
       "type": "build"
     },
     {
@@ -26,6 +38,10 @@
     {
       "name": "aws-cdk",
       "version": "^2",
+      "type": "build"
+    },
+    {
+      "name": "aws-lambda",
       "type": "build"
     },
     {
@@ -71,8 +87,28 @@
       "type": "build"
     },
     {
+      "name": "@aws-sdk/client-route-53",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws-sdk/client-ssm",
+      "type": "runtime"
+    },
+    {
+      "name": "@types/aws-lambda",
+      "type": "runtime"
+    },
+    {
+      "name": "@types/node",
+      "type": "runtime"
+    },
+    {
       "name": "aws-cdk-lib",
-      "version": "^2.1.0",
+      "version": "^2.180.0",
+      "type": "runtime"
+    },
+    {
+      "name": "aws-lambda",
       "type": "runtime"
     },
     {
