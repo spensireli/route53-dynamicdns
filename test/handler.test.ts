@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import { ScheduledEvent, Context, Callback } from 'aws-lambda';
 import { handler } from '../src/lambda/handler';
 
@@ -15,6 +16,7 @@ jest.mock('@aws-sdk/client-route-53', () => {
   return {
     Route53Client: jest.fn(() => ({ send: mockSend })),
     ChangeResourceRecordSetsCommand: jest.fn(),
+    ListResourceRecordSetsCommand: jest.fn(),
     mockSend,
   };
 });
@@ -29,13 +31,11 @@ describe('Lambda Handler', () => {
     mockRoute53Send = require('@aws-sdk/client-route-53').mockSend;
     mockRoute53Send.mockReset();
     process.env.HOSTED_ZONE_ID = 'test-zone-id';
-    process.env.DYNAMO_TABLE = 'test-table';
     process.env.SUB_DOMAIN = 'test.example.com';
   });
 
   afterEach(() => {
     delete process.env.HOSTED_ZONE_ID;
-    delete process.env.DYNAMO_TABLE;
     delete process.env.SUB_DOMAIN;
   });
 
@@ -78,11 +78,86 @@ describe('Lambda Handler', () => {
       },
     };
 
+    const ListResourceRecordSetsResponseMock = {
+      ResourceRecordSets: [ 
+        { 
+          Name: "test.example.com'", 
+          Type: "A",
+          SetIdentifier: "FAKEIDENTIFIER",
+          TTL: 60,
+          ResourceRecords: [
+            {
+              Value: "1.1.1.1",
+            },
+          ],
+        },
+      ],
+      MaxItems: 1,
+    }
+ 
+
+    mockSSMSend.mockResolvedValue(mockItems);
+    mockRoute53Send.mockResolvedValue(ListResourceRecordSetsResponseMock);
+    const response = await handler(cloudWatchEvent, mockContext, mockCallback);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual('Success');
+    expect(mockRoute53Send).toHaveBeenCalled();
+  });
+
+
+  it('should return a 200 response with items when SSM returns data and updates Route53 when no record is found in route53', async () => {
+
+    const mockItems = {
+      Parameter: {
+        Name: 'test-param-name',
+        Value: '123.456.789.999',
+        Version: Number('long'),
+      },
+    };
+ 
+
     mockSSMSend.mockResolvedValue(mockItems);
     mockRoute53Send.mockResolvedValue({});
     const response = await handler(cloudWatchEvent, mockContext, mockCallback);
     expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.body)).toEqual(mockItems.Parameter.Value);
+    expect(response.body).toEqual('Success');
+    expect(mockRoute53Send).toHaveBeenCalled();
+  });
+
+  it('should return a 200 response with items when SSM returns data and not update Route53', async () => {
+
+    const mockItems = {
+      Parameter: {
+        Name: 'test-param-name',
+        Value: '123.456.789.999',
+        Version: Number('long'),
+      },
+    };
+
+    const ListResourceRecordSetsResponseMock = {
+      ResourceRecordSets: [ 
+        { 
+          Name: "test.example.com'", 
+          Type: "A",
+          SetIdentifier: "FAKEIDENTIFIER",
+          TTL: 60,
+          ResourceRecords: [
+            {
+              Value: "123.456.789.999",
+            },
+          ],
+        },
+      ],
+      MaxItems: 1,
+    }
+ 
+
+    mockSSMSend.mockResolvedValue(mockItems);
+    mockRoute53Send.mockResolvedValue(ListResourceRecordSetsResponseMock);
+    // mockRoute53Send.mockResolvedValue({});
+    const response = await handler(cloudWatchEvent, mockContext, mockCallback);
+    expect(response.statusCode).toBe(200);
+    expect(response.body).toEqual('Success');
     expect(mockRoute53Send).toHaveBeenCalled();
   });
 

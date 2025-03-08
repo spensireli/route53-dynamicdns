@@ -34,6 +34,8 @@
     "@typescript-eslint/parser": "^8",
     "aws-cdk": "^2",
     "aws-lambda": "^1.0.7",
+    "axios": "^1.8.2",
+    "dotenv": "^16.4.7",
     "esbuild": "^0.25.0",
     "eslint": "^9",
     "eslint-import-resolver-typescript": "^3.8.3",

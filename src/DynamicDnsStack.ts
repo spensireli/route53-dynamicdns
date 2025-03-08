@@ -15,6 +15,7 @@ import { Construct } from 'constructs';
 interface DynamicDnsStackProps extends StackProps {
   hostedZoneName: string; // The hosted zone domain name ex: conklin.io
   pollInterval: number; // In seconds how often to poll for IP address updates. Defaults to 60 seconds.
+  subDomainName: string; // Subdomain in fqdn format example home.conklin.io
 }
 
 export class DynamicDnsStack extends Stack {
@@ -45,9 +46,16 @@ export class DynamicDnsStack extends Stack {
       environment: {
         HOSTED_ZONE_ID: zone.hostedZoneId,
         SSM_PARAM: dynamicDnsParam.parameterName,
+        SUB_DOMAIN: props.subDomainName,
       },
     });
     dynamicDnsParam.grantRead(dynamicDnsFunction);
+    dynamicDnsFunction.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['route53:ChangeResourceRecordSets', 'route53:ListResourceRecordSets'],
+        resources: [zone.hostedZoneArn],
+      })
+    )
 
     const pollingRule = new events.Rule(this, 'PollEvent', {
       schedule: events.Schedule.rate(Duration.seconds(props.pollInterval)),

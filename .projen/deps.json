@@ -45,6 +45,14 @@
       "type": "build"
     },
     {
+      "name": "axios",
+      "type": "build"
+    },
+    {
+      "name": "dotenv",
+      "type": "build"
+    },
+    {
       "name": "esbuild",
       "type": "build"
     },

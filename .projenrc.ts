@@ -22,6 +22,8 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     '@types/aws-lambda',
     '@aws-sdk/client-ssm',
     '@aws-sdk/client-route-53',
+    'dotenv',
+    'axios',
   ], /* Build dependencies for this module. */
   // packageName: undefined,  /* The "name" in package.json. */
 });

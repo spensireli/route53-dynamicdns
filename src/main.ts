@@ -8,6 +8,6 @@ const devEnv = {
 
 const app = new App();
 
-new DynamicDnsStack(app, 'route53-dynamicdns', { env: devEnv, hostedZoneName: 'conklin.io', pollInterval: 120 });
+new DynamicDnsStack(app, 'route53-dynamicdns', { env: devEnv, hostedZoneName: 'conklin.io', pollInterval: 120, subDomainName: 'home.conklin.io' });
 
 app.synth();
