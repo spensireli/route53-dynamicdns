@@ -5,9 +5,8 @@ import { SSMClient, PutParameterCommand, ParameterType } from "@aws-sdk/client-s
 
 dotenv.config();
 
-const DEFAULT_INTERVAL_SECONDS = 30; // 30 seconds
+const DEFAULT_INTERVAL_SECONDS = 30;
 
-// Get polling interval from environment variables or CLI argument
 const intervalSeconds = process.env.POLL_INTERVAL
   ? parseInt(process.env.POLL_INTERVAL, 10)
   : process.argv[2]
@@ -15,7 +14,7 @@ const intervalSeconds = process.env.POLL_INTERVAL
   : DEFAULT_INTERVAL_SECONDS;
 
 if (isNaN(intervalSeconds) || intervalSeconds <= 0) {
-  console.error('Invalid polling interval. Using default 30 seconds.');
+  console.log('Invalid polling interval. Using default 30 seconds.');
 }
 
 const intervalMs = intervalSeconds * 1000;
@@ -23,7 +22,7 @@ let storedIpAddress: string | null = null;
 
 const client = new SSMClient({});
 
-async function updateSSMParameter(ipAddress: string) {
+export async function updateSSMParameter(ipAddress: string) {
   try {
     const input = {
       Name: "DynamicDNSIpAddress",
@@ -40,7 +39,7 @@ async function updateSSMParameter(ipAddress: string) {
   }
 }
 
-async function fetchIPAddress() {
+export async function fetchIPAddress() {
   try {
     const response = await axios.get('https://checkip.amazonaws.com');
     const ipAddress = response.data.trim();
@@ -57,5 +56,11 @@ async function fetchIPAddress() {
   }
 }
 
-console.log(`Polling IP address every ${intervalSeconds} seconds...`);
-setInterval(fetchIPAddress, intervalMs);
+export function startPolling() {
+  console.log(`Polling IP address every ${intervalSeconds} seconds...`);
+  return setInterval(fetchIPAddress, intervalMs);
+}
+
+if (process.env.NODE_ENV !== 'test') {
+  startPolling();
+}
