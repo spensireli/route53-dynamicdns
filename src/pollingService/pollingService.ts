@@ -36,6 +36,7 @@ export async function updateSSMParameter(ipAddress: string) {
     console.log(`Updated SSM Parameter Store with IP: ${ipAddress}`);
   } catch (error) {
     console.error('Error updating SSM Parameter Store:', error);
+    storedIpAddress = null
   }
 }
 
