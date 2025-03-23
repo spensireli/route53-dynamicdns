@@ -1,6 +1,6 @@
 services:
   polling:
-    image: spensireli/route53-dynamicdns:v.0.0.1
+    image: spensireli/route53-dynamicdns:v.0.0.2
     container_name: route53-dynamicdns-polling-service 
     network_mode: host
     env_file: "example.env"
