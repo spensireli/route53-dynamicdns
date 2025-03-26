@@ -11,13 +11,42 @@ image:
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "v.0.0.3"
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 # This is to override the chart name.
 nameOverride: ""
 fullnameOverride: ""
+
+# Example usage with Kubernetes secret. This assumes you have a kubernetes secret created called `aws-credentials-foo`. 
+# The credential should be stored in the value of access-key-id and access-key-secret
+# Example...
+#apiVersion: v1
+#kind: Secret
+#metadata:
+#  name: aws-credentials-foo
+#  labels:
+#    app: my-app
+#type: Opaque
+#data:
+#  access-key-id: your-base64-encoded-value
+#  access-key-secret: our-base64-encoded-value
+env:
+  - name: AWS_ACCESS_KEY_ID
+    valueFrom:
+      secretKeyRef:
+        key: access-key-id
+        name: aws-credentials-foo
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        key: access-key-secret
+        name: aws-credentials-foo
+  - name: AWS_REGION
+    value: "us-east-1"
+  - name: POLL_INTERVAL
+    value: "300" # Poll every 300 seconds
 
 # This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
 serviceAccount:
